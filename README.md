@@ -1,36 +1,27 @@
-package io.github.pgerhard;
+# Example Vaadin 7.3.6 Application for Stackoverflow Question 65687155
 
-import javax.servlet.annotation.WebServlet;
+This is an example Vaadin 7.3.6 Application providing a solution to the issue described in the [Stackoverflow Question 65687155 - Not update button title when start countdown](https://stackoverflow.com/questions/65687155/not-update-button-title-when-start-countdown)
+The project was generated using the Vaadin Maven Archetype using the below command
 
-import com.vaadin.annotations.Push;
-import com.vaadin.annotations.Theme;
-import com.vaadin.annotations.VaadinServletConfiguration;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.server.VaadinServlet;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
+```shell
+mvn archetype:generate \
+   -DarchetypeGroupId=com.vaadin \
+   -DarchetypeArtifactId=vaadin-archetype-application \
+   -DarchetypeVersion=7.3.6 \
+   -DgroupId=io.github.pgerhard \
+   -DartifactId=stackoverflow-65687155 \
+   -Dversion=0.0.1-SNAPSHOT \
+   -Dpackaging=war
+```
 
-import java.util.Timer;
-import java.util.TimerTask;
+The only changes made were
 
-@Push
-@Theme("mytheme")
-@SuppressWarnings("serial")
-public class MyVaadinUI extends UI {
-
-    @WebServlet(value = "/*", asyncSupported = true)
-    @VaadinServletConfiguration(productionMode = false, ui = MyVaadinUI.class, widgetset = "io.github.pgerhard.AppWidgetSet")
-    public static class Servlet extends VaadinServlet {
-    }
-
-    @Override
-    protected void init(VaadinRequest request) {
-        final VerticalLayout layout = new VerticalLayout();
-        layout.setMargin(true);
-        setContent(layout);
+1. Added annotation `@Push` to `MyVaadinUI`
+2. Implemented the timer logic and customized UI slightly
+```java
+final VerticalLayout layout = new VerticalLayout();
+layout.setMargin(true);
+setContent(layout);
 
         final Timer timer = new Timer();
         final Button button = new Button("Start Countdown");
@@ -42,7 +33,6 @@ public class MyVaadinUI extends UI {
                 countDownLabel.setVisible(true);
                 layout.addComponent(countDownLabel);
                 button.setCaption("10");
-                button.setEnabled(false);
 
                 timer.scheduleAtFixedRate(new TimerTask() {
                     int secondsLeft = 10;
@@ -58,7 +48,6 @@ public class MyVaadinUI extends UI {
                                 public void run() {
                                     button.setCaption("Start Countdown");
                                     countDownLabel.setVisible(false);
-                                    button.setEnabled(true);
                                 }
                             });
                         } else {
@@ -77,6 +66,11 @@ public class MyVaadinUI extends UI {
         });
         layout.addComponent(button);
         layout.addComponent(countDownLabel);
-    }
+```
+3. Built project using `mvn clean install`
+4. Started Jetty server using `mvn jetty:run`
 
-}
+Information on local environment
+* Java Version: `AdoptOpenJDK 1.8 282 HotSpot`
+* OS: Mac OS 10.15.7
+* Servlet Container: Jetty provided in Maven pom.xml (version 9.2.3.v20140905 according to log output)
